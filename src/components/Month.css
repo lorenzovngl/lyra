@@ -1,0 +1,8 @@
+.Month header {
+    text-align: center;
+}
+
+.Month .name {
+    display: inline;
+    padding: 10px;
+}
