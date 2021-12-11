@@ -26,8 +26,7 @@ class App extends React.Component {
         }
         result.push(obj);
       }
-      return result; //JavaScript object
-      //return JSON.stringify(result); //JSON
+      return result;
     }
 
     function parseCSV(csv) {
@@ -39,14 +38,7 @@ class App extends React.Component {
           array[i]['Date'] = array[i]['Date'].add(1, 'M')
         }
       }
-      return array/*.filter(function(x) {
-        let key_notes = Object.keys(x)[1];
-        return (//Number(moment(x['Date'], "YYYY-MM-DD").format('MM')) > 4 && 
-        x[key_notes].indexOf("Rimborso mamma") === -1 && 
-        x[key_notes].indexOf("Regalo laurea") === -1 && 
-        x[key_notes].indexOf("Assicurazione") === -1 && 
-        x[key_notes].indexOf("Celestron") === -1) 
-      })*/
+      return array
     }
 
     fetch(expenses)

@@ -24,3 +24,4 @@ yarn-error.log*
 
 # Protected data
 /src/data
+/src/config.json

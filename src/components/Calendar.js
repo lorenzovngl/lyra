@@ -2,7 +2,7 @@ import React from 'react'
 import moment from 'moment'
 import Month from './Month'
 import Predictions from './Predictions'
-import ChartCategories from './ChartCategories'
+import Categories from './Categories'
 import currency from 'currency.js'
 import { Bar } from 'react-chartjs-2';
 
@@ -136,6 +136,13 @@ class Calendar extends React.Component {
     return sum / diff
   }
 
+  days() {
+    const a = moment([2021, 3, 1]) // 3 is April (n-1)
+    const today = moment()
+    const diff = today.diff(a, 'days')
+    return diff
+  }
+
   period_covered(){
     let balance = this.balance()
     let daily_exp = Math.abs(this.daily(this.expenses()))
@@ -145,13 +152,38 @@ class Calendar extends React.Component {
     months -= years * 12
     days -= years * 365 + months * 30
     let deadline = moment().add(years * 365 + months * 30 + days, 'days').format("DD/MM/YYYY")
+    let result = ""
     if (years > 0){
-      return years + " anno, " + months + " mesi e " + days + " giorni"
-    } else if (months > 0){
-      return months + " mesi e " + days + " giorni (" + deadline + ")"
-    } else {
-      return days + " giorni"
+      result += years
+      if (years > 1){
+        result += " years"
+      } else {
+        result += " year"
+      }
+    } 
+    if (months > 0){
+      if (result !== ""){
+        result += ", "
+      }
+      result += months
+      if (months > 1){
+        result += " months"
+      } else {
+        result += " month"
+      }
     }
+    if (days > 0){
+      if (result !== ""){
+        result += ", "
+      }
+      result += days
+      if (days > 1){
+        result += " days"
+      } else {
+        result += " day"
+      }
+    }
+    return result + " (until " + deadline + ")"
   }
 
   render() {
@@ -166,37 +198,37 @@ class Calendar extends React.Component {
             <table id="table-total" className="table table-striped table-hover">
               <tbody>
                 <tr>
-                  <td>Totale entrate</td>
+                  <td>Total incomes</td>
                   <td id="total-inc" align="right">{EURO(this.incomes()).format()} €</td>
                 </tr>
                 <tr>
-                  <td>Totale uscite</td>
+                  <td>Total expenses</td>
                   <td id="total-exp" align="right">{EURO(this.expenses()).format()} €</td>
                 </tr>
                 <tr>
-                  <td>Saldo</td>
+                  <td>Current balance</td>
                   <td id="balance" align="right"><b>{EURO(this.balance()).format()} €</b></td>
                 </tr>
                 <tr>
-                  <td>Periodo di copertura</td>
+                  <td>Period of coverage</td>
                   <td align="right">{this.period_covered()}</td>
                 </tr>
                 <tr>
-                  <td>Entrate giornaliere</td>
+                  <td>Daily incomes</td>
                   <td id="daily-inc" align="right">{EURO(this.daily(this.incomes())).format()} €</td>
                 </tr>
                 <tr>
-                  <td>Uscite giornaliere</td>
+                  <td>Daily expenses</td>
                   <td id="daily-exp" align="right">{EURO(this.daily(this.expenses())).format()} €</td>
                 </tr>
                 <tr>
-                  <td>Saldo giornaliero</td>
+                  <td>Daily balance</td>
                   <td id="daily-balance" align="right"><b>{EURO(this.daily(this.balance())).format()} €</b></td>
                 </tr>
                 <tr>
                   <td>Average monthly balance</td>
                   <td id="daily-balance" align="right">
-                    {EURO(avgMonthlyBalance - stdMonthlyBalance).format()} - {EURO(avgMonthlyBalance + stdMonthlyBalance).format()} €
+                  {EURO(avgMonthlyBalance).format()} ({EURO(avgMonthlyBalance - stdMonthlyBalance).format()} - {EURO(avgMonthlyBalance + stdMonthlyBalance).format()}) €
                   </td>
                 </tr>
               </tbody>
@@ -208,7 +240,7 @@ class Calendar extends React.Component {
         </div>
         <div className="row">
           <div className="col-lg-6">
-            <ChartCategories expenses={this.props.data.expenses}/>
+            <Categories expenses={this.props.data.expenses} days={this.days()}/>
           </div>
           <div className="col-lg-6">
             <Predictions

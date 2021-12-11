@@ -24,7 +24,6 @@ class Predictions extends React.Component {
             maxB += e.balance
             arrayMin.push(minB)
             arrayMax.push(maxB)
-            console.log(i)
         });
         for (let i = 0; i < years * 12; i++) {
             minB += minBalance
@@ -33,10 +32,6 @@ class Predictions extends React.Component {
             arrayMin.push(minB)
             arrayMax.push(maxB)
             cMonth = cMonth.add(1, 'month')
-            if (cMonth.format('M') === '12'){
-                minB += 1400
-                maxB += 1400
-            }
         }
         const chartData = {
             labels: labels,

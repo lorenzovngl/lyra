@@ -32,13 +32,13 @@ class Month extends React.Component {
 
   prev() {
     this.setState((prevState) => ({
-      month: prevState.month - 1
+      month: (prevState.month > 0) ? prevState.month - 1 : 11
     }))
   }
 
   next() {
     this.setState((prevState) => ({
-      month: prevState.month + 1
+      month: (prevState.month + 1) % 12
     }))
   }
 
@@ -87,7 +87,12 @@ class Month extends React.Component {
 
   render() {
     let weeks = []
-    for (let i = this.firstWeek(); i < this.lastWeek(); i++) {
+    let lastWeek = this.lastWeek()
+    if (lastWeek < this.firstWeek()) {
+      lastWeek += 52
+    }
+    console.log(this.firstWeek(), lastWeek)
+    for (let i = this.firstWeek(); i < lastWeek; i++) {
       weeks.push(i)
     }
     let prediction

@@ -5,6 +5,7 @@ import Day from './Day'
 class Week extends React.Component {
 
   render() {
+    console.log(this.props)
     moment.updateLocale('en', {
       week: {
         dow : 1, // Monday is the first day of the week.
