@@ -7,9 +7,30 @@ const EURO = value => currency(value, { symbol: '', decimal: ',', separator: '.'
 
 class Predictions extends React.Component {
 
+    mean(a) {
+        let sum = 0
+        for (let i = 0; i < a.length; i++) {
+          sum += a[i]
+        }
+        return sum / a.length
+      }
+    
+      std(a) {
+        let mean = this.mean(a)
+        let sum = 0
+        for (let i = 0; i < a.length; i++) {
+          sum += Math.pow(a[i] - mean, 2)
+        }
+        return Math.sqrt(sum / a.length)
+      }
+
     render() {
-        let minBalance = this.props.avgMonthlyBalance - this.props.stdMonthlyBalance
-        let maxBalance = this.props.avgMonthlyBalance + this.props.stdMonthlyBalance
+        let monthlyBalances = Object.entries(this.props.monthlyBalances)
+        monthlyBalances = monthlyBalances.map(x => ({ 'month': x[0], ...x[1] }))
+        let avgMonthlyBalance = this.mean(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))
+        let stdMonthlyBalance = this.std(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))    
+        let minBalance = avgMonthlyBalance - stdMonthlyBalance
+        let maxBalance = avgMonthlyBalance + stdMonthlyBalance
         let minB = 0
         let maxB = 0
         let cMonth = moment()
@@ -17,7 +38,7 @@ class Predictions extends React.Component {
         let arrayMin = []
         let arrayMax = []
         let years = 3
-        this.props.monthlyBalances.slice(1).reverse().forEach((e, i, array) => {
+        monthlyBalances.slice(1).reverse().forEach((e, i, array) => {
             let m = moment(e.month)
             labels.push(m.format('MMMM YYYY'))
             minB += e.balance
