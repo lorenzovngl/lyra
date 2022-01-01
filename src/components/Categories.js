@@ -54,7 +54,7 @@ class Categories extends React.Component {
     return (
       <div>
         <h3>Expense categories</h3>
-        <table class="table">
+        <table className="table">
           <thead>
             <tr>
               <th scope="col">#</th>

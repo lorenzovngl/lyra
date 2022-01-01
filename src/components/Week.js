@@ -5,7 +5,6 @@ import Day from './Day'
 class Week extends React.Component {
 
   render() {
-    console.log(this.props)
     moment.updateLocale('en', {
       week: {
         dow : 1, // Monday is the first day of the week.
@@ -16,7 +15,7 @@ class Week extends React.Component {
       days.push({
         number: moment().day(i+1).week(this.props.number).format('D'),
         month: moment().day(i+1).week(this.props.number).month(),
-        date: moment().day(i+1).week(this.props.number).format('YYYY-MM-DD')
+        date: moment().day(i+1).week(this.props.number).year(this.props.year).format('YYYY-MM-DD')
       })
     }
     return (

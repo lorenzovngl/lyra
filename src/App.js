@@ -48,13 +48,30 @@ class App extends React.Component {
     function parseCSV(csv) {
       let array = csvToJSON(csv)
       for (let i = 0; i < array.length; i++) {
-        let key_notes = Object.keys(array[i])[1];
         array[i]['Date'] = moment(array[i]['Date'], "YYYY-MM-DD");
-        if (array[i][key_notes].indexOf("Buoni pasto") !== -1 && array[i]['Date'].date() > 15) {
-          array[i]['Date'] = array[i]['Date'].add(1, 'M')
-        }
       }
       return array
+    }
+
+    function preprocessIncomes(incomes) {
+      for (let i = 0; i < incomes.length; i++) {
+        let key_notes = Object.keys(incomes[i])[1];
+        if (incomes[i][key_notes].indexOf("Buoni pasto") !== -1 && incomes[i]['Date'].date() > 15) {
+          incomes[i]['Date'] = incomes[i]['Date'].add(1, 'M')
+        }
+      }
+      return incomes
+    }
+
+    function preprocessExpenses(expenses) {
+      for (let i = 0; i < expenses.length; i++) {
+        let key_notes = Object.keys(expenses[i])[4];
+        expenses[i]['Amount'] = Number(expenses[i]['Amount'])
+        if (expenses[i][key_notes]?.indexOf("Spesa familiare") !== -1) {
+          expenses[i]['Amount'] = expenses[i]['Amount'] * 0.4
+        }
+      }
+      return expenses
     }
 
     fetch(expenses)
@@ -64,7 +81,7 @@ class App extends React.Component {
           ...prevState,
           data: {
             ...prevState.data,
-            expenses: parseCSV(csv)
+            expenses: preprocessExpenses(parseCSV(csv))
           }
         })
         )
@@ -75,7 +92,7 @@ class App extends React.Component {
         ...prevState,
         data: {
           ...prevState.data,
-          incomes: parseCSV(csv)
+          incomes: preprocessIncomes(parseCSV(csv))
         }
       })
       )
@@ -133,38 +150,30 @@ class App extends React.Component {
   computeMonthlyBalances() {
     let monthlyBalances = []
     let incomes = this.state.data.incomes
-    if (incomes !== undefined) {
+    if (incomes) {
       for (let i = 0; i < incomes.length; i++) {
         let m = this.state.data.incomes[i]['Date'].format("YYYY-MM")
-        if (/*m !== moment().format("YYYY-MM") &&*/ m !== "2021-04") {
-          if (!monthlyBalances[m]) {
-            monthlyBalances[m] = {}
-          }
-          if (!monthlyBalances[m]['incomes']) {
-            monthlyBalances[m]['incomes'] = 0
-          }
-          monthlyBalances[m]['incomes'] += Number(incomes[i]['Amount'])
+        if (!monthlyBalances[m]) {
+          monthlyBalances[m] = {}
         }
+        if (!monthlyBalances[m]['incomes']) {
+          monthlyBalances[m]['incomes'] = 0
+        }
+        monthlyBalances[m]['incomes'] += Number(incomes[i]['Amount'])
       }
     }
     let expenses = this.state.data.expenses
-    if (expenses !== undefined) {
+    if (expenses) {
       for (let i = 0; i < expenses.length; i++) {
         let m = this.state.data.expenses[i]['Date'].format("YYYY-MM")
-        if (/*m !== moment().format("YYYY-MM") &&*/ m !== "2021-04") {
-          let tmp = Number(expenses[i]['Amount'])
-          let key_notes = Object.keys(expenses[i])[4];
-          if (expenses[i][key_notes] !== undefined && expenses[i][key_notes].indexOf("Spesa familiare") !== -1) {
-            tmp = Number(expenses[i]['Amount']) * 0.4
-          }
-          if (!monthlyBalances[m]) {
-            monthlyBalances[m] = {}
-          }
-          if (!monthlyBalances[m]['expenses']) {
-            monthlyBalances[m]['expenses'] = 0
-          }
-          monthlyBalances[m]['expenses'] += tmp
+        let tmp = Number(expenses[i]['Amount'])
+        if (!monthlyBalances[m]) {
+          monthlyBalances[m] = {}
         }
+        if (!monthlyBalances[m]['expenses']) {
+          monthlyBalances[m]['expenses'] = 0
+        }
+        monthlyBalances[m]['expenses'] += tmp
       }
     }
     for (let i = 0; i < Object.entries(monthlyBalances).length; i++) {
@@ -190,12 +199,7 @@ class App extends React.Component {
     let expenses = this.state.data.expenses
     if (expenses !== undefined) {
       for (let i = 0; i < expenses.length; i++) {
-        let key_notes = Object.keys(expenses[i])[4];
-        if (expenses[i][key_notes] !== undefined && expenses[i][key_notes].indexOf("Spesa familiare") !== -1) {
-          res -= Number(expenses[i]['Amount']) * 0.4
-        } else {
-          res -= Number(expenses[i]['Amount'])
-        }
+        res -= Number(expenses[i]['Amount'])
       }
     }
     return res
@@ -208,11 +212,10 @@ class App extends React.Component {
   render() {
     this.computeMonthlyBalances()
     let content;
-    console.log(this.state)
     if (this.state.tabs_visibility.summary) {
       content = (
         <Summary data={this.state.data} monthlyBalances={this.computeMonthlyBalances()}
-        totalIncomes={this.totalIncomes()} totalExpenses={this.totalExpenses()} balance={this.balance()}/>
+          totalIncomes={this.totalIncomes()} totalExpenses={this.totalExpenses()} balance={this.balance()} />
       )
     } else if (this.state.tabs_visibility.calendar) {
       content = (

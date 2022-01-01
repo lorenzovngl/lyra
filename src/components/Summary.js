@@ -1,6 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 import currency from 'currency.js'
+import { Bar } from 'react-chartjs-2'
 
 const EURO = value => currency(value, { symbol: '', decimal: ',', separator: '.' })
 
@@ -83,9 +84,29 @@ class Summary extends React.Component {
   render() {
     let avgMonthlyBalance
     let stdMonthlyBalance
-    if (this.props.monthlyBalances !== undefined) {
+    if (this.props.monthlyBalances) {
       avgMonthlyBalance = this.mean(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].balance))
       stdMonthlyBalance = this.std(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].balance))
+    }
+    let chartData = {
+      labels: Object.entries(this.props.monthlyBalances).map(x => x[0]).reverse().map(x => moment(x).format('MMMM YYYY')),
+      datasets: [
+        {
+          label: 'Incomes',
+          data: Object.entries(this.props.monthlyBalances).map(x => x[1].incomes).reverse(),
+          backgroundColor: 'rgb(100, 99, 255)',
+        },
+        {
+          label: 'Expenses',
+          data: Object.entries(this.props.monthlyBalances).map(x => x[1].expenses).reverse(),
+          backgroundColor: 'rgb(255, 99, 132)',
+        },
+        {
+          label: 'Balance',
+          data: Object.entries(this.props.monthlyBalances).map(x => x[1].balance).reverse(),
+          backgroundColor: 'rgb(75, 192, 192)',
+        },
+      ]
     }
     return (
       <div>
@@ -128,6 +149,7 @@ class Summary extends React.Component {
             </tr>
           </tbody>
         </table>
+        <Bar data={chartData} />
       </div>
     )
   }

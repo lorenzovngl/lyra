@@ -69,7 +69,7 @@ class Calendar extends React.Component {
   render() {
     this.props.data.dailyExpenses = this.daily(this.expenses())
     return (
-      <Month name={moment().format('MMMM')} data={this.props.data} />
+      <Month name={moment().format('MMMM-YYYY')} data={this.props.data} />
     )
   }
 }

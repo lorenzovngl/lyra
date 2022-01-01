@@ -6,19 +6,19 @@ class Day extends React.Component {
 
   render() {
     let items = []
-    if (this.props.data.incomes !== undefined) {
+    if (this.props.data.incomes) {
       items.push(this.props.data.incomes.filter(function (item) {
         return item["Date"].format("YYYY-MM-DD") === this.props.date
       }, this).map(function (item) {
         return <Movement label={item["Label"]} amount={Number(item["Amount"])} />
       }))
     }
-    if (this.props.data.expenses !== undefined) {
+    if (this.props.data.expenses) {
       items.push(this.props.data.expenses.filter(function (item) {
         return item["Date"].format("YYYY-MM-DD") === this.props.date
       }, this).map(function (item) {
         let key_notes = Object.keys(item)[4];
-        if (item[key_notes] !== undefined && item[key_notes].indexOf("Spesa familiare") !== -1) {
+        if (item[key_notes]?.indexOf("Spesa familiare") !== -1) {
           return <Movement label={item["Label"]} amount={-Number(item["Amount"]) * 0.4} />
         } else {
           return <Movement label={item["Label"]} amount={-Number(item["Amount"])} />
