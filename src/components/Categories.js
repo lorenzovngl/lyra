@@ -19,17 +19,17 @@ class Categories extends React.Component {
       let expenses = this.props.data.expenses
       expenses.forEach(function (e) {
         let tag = e.Tags.trim()
-        if (tag !== "Affitto") {
-          if (cat[tag] === undefined) {
-            cat[tag] = 0
-          }
-          let key_notes = Object.keys(e)[4];
-          if (e[key_notes] !== undefined && e[key_notes].indexOf("Spesa familiare") !== -1) {
-            cat[tag] += parseFloat(e.Amount) * 0.4
-          } else {
-            cat[tag] += parseFloat(e.Amount)
-          }
+        if (cat[tag] === undefined) {
+          cat[tag] = {}
         }
+        if (cat[tag]['total'] === undefined) {
+          cat[tag]['total'] = 0
+        }
+        if (cat[tag][e['Date'].format('YYYY-MM')] === undefined) {
+          cat[tag][e['Date'].format('YYYY-MM')] = 0
+        }
+        cat[tag][e['Date'].format('YYYY-MM')] += parseFloat(e.Amount)
+        cat[tag]['total'] += parseFloat(e.Amount)
       })
     }
     return cat
@@ -39,18 +39,24 @@ class Categories extends React.Component {
     let expenses = Object.entries(this.expensesCategories())
     let total = 0
     if (expenses.length > 1) {
-      total = expenses.map(x => x[1]).reduce((acc, x) => acc + x)
+      total = expenses.map(x => x[1]['total']).reduce((acc, x) => acc + x)
       total = total / this.days() * 30
     }
     expenses = expenses.sort((a, b) => {
-      if (a[1] > b[1]) {
+      if (a[1]['total'] > b[1]['total']) {
         return -1
       }
-      if (a[1] < b[1]) {
+      if (a[1]['total'] < b[1]['total']) {
         return 1
       }
       return 0
     })
+    let months = []
+    let m = moment()
+    for (let i = 0; i < 6; i++) {
+      months.push(m.clone())
+      m.subtract(1, 'months')
+    }
     return (
       <div>
         <h3>Expense categories</h3>
@@ -59,20 +65,43 @@ class Categories extends React.Component {
             <tr>
               <th scope="col">#</th>
               <th scope="col">Category</th>
-              <th scope="col">Amount</th>
+              <th scope="col">Amount/month</th>
               <th scope="col">Percent</th>
+              {
+                months.map(function (item, index) {
+                  return <th scope="col">{item.format('MMMM YYYY')}</th>
+                })
+              }
             </tr>
           </thead>
           <tbody>
             {
               expenses.map(function (item, index) {
-                let amount = item[1] / this.days() * 30
-                let perc = (amount / total * 100).toFixed(1)
+                let avg_amount = item[1]['total'] / this.days() * 30
+                let perc = (avg_amount / total * 100).toFixed(1)
                 return <tr>
                   <td>{index + 1}.</td>
                   <td>{item[0]}</td>
-                  <td>{EURO(amount).format()} €</td>
+                  <td>{EURO(avg_amount).format()} €</td>
                   <td>{perc} %</td>
+                  {
+                    months.map(function (i, index) {
+                      let amount = item[1][i.format('YYYY-MM')]
+                      if (amount > 0) {
+                        let clName = "text-danger"
+                        if (amount < avg_amount) {
+                          clName = "text-success"
+                        }
+                        return <td>
+                          <span className={clName}>{EURO(amount).format()} €</span>
+                        </td>
+                      } else {
+                        return <td>
+                          <span className="text-muted">-</span>
+                        </td>
+                      }
+                    })
+                  }
                 </tr>
               }, this)
             }

@@ -67,7 +67,8 @@ class App extends React.Component {
       for (let i = 0; i < expenses.length; i++) {
         let key_notes = Object.keys(expenses[i])[4];
         expenses[i]['Amount'] = Number(expenses[i]['Amount'])
-        if (expenses[i][key_notes]?.indexOf("Spesa familiare") !== -1) {
+        let val = expenses[i][key_notes]?.indexOf("Spesa familiare")
+        if (val !== undefined && val !== -1) {
           expenses[i]['Amount'] = expenses[i]['Amount'] * 0.4
         }
       }

@@ -20,12 +20,7 @@ class Calendar extends React.Component {
     let expenses = this.props.data.expenses
     if (expenses !== undefined) {
       for (let i = 0; i < expenses.length; i++) {
-        let key_notes = Object.keys(expenses[i])[4];
-        if (expenses[i][key_notes] !== undefined && expenses[i][key_notes].indexOf("Spesa familiare") !== -1) {
-          res -= Number(expenses[i]['Amount']) * 0.4
-        } else {
-          res -= Number(expenses[i]['Amount'])
-        }
+        res -= Number(expenses[i]['Amount'])
       }
     }
     return res
