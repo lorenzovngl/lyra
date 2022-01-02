@@ -10,45 +10,85 @@ class Predictions extends React.Component {
     mean(a) {
         let sum = 0
         for (let i = 0; i < a.length; i++) {
-          sum += a[i]
+            sum += a[i]
         }
         return sum / a.length
-      }
-    
-      std(a) {
+    }
+
+    std(a) {
         let mean = this.mean(a)
         let sum = 0
         for (let i = 0; i < a.length; i++) {
-          sum += Math.pow(a[i] - mean, 2)
+            sum += Math.pow(a[i] - mean, 2)
         }
         return Math.sqrt(sum / a.length)
-      }
+    }
 
     render() {
         let monthlyBalances = Object.entries(this.props.monthlyBalances)
-        monthlyBalances = monthlyBalances.map(x => ({ 'month': x[0], ...x[1] }))
+        monthlyBalances = monthlyBalances.map(x => (
+            { 
+                'month': x[0].split('-')[1], 
+                'year': x[0].split('-')[0], 
+                ...x[1] 
+            }
+        ))
         let avgMonthlyBalance = this.mean(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))
-        let stdMonthlyBalance = this.std(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))    
-        let minBalance = avgMonthlyBalance - stdMonthlyBalance
-        let maxBalance = avgMonthlyBalance + stdMonthlyBalance
+        //let stdMonthlyBalance = this.std(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))
+        let avgMonthlyBalances = {}
+        let stdMonthlyBalances = {}
+        let cMonth = moment().month('0')
+        console.log(cMonth)
+        for (let i = 0; i < 12; i++){
+            let key = cMonth.format('MM-MMM')
+            avgMonthlyBalances[key] = []
+            monthlyBalances.forEach((e, i, array) => {
+                if (e.month === cMonth.format('MM') && e.balance){
+                    avgMonthlyBalances[key].push(e.balance)
+                }
+            })
+            stdMonthlyBalances[key] = this.std(avgMonthlyBalances[key])
+            avgMonthlyBalances[key] = this.mean(avgMonthlyBalances[key])
+            if (isNaN(avgMonthlyBalances[key])){
+                avgMonthlyBalances[key] = avgMonthlyBalance
+            }
+            if (isNaN(stdMonthlyBalances[key])){
+                stdMonthlyBalances[key] = 0
+            } 
+            cMonth.add(1, 'months')
+        }
+        console.log(avgMonthlyBalances)
+        console.log(stdMonthlyBalances)
+        let minBalances = {}
+        let maxBalances = {}
+        cMonth = moment().month('0')
+        for (let i = 0; i < 12; i++){
+            let key = cMonth.format('MM-MMM')
+            minBalances[key] = avgMonthlyBalances[key] - stdMonthlyBalances[key]
+            maxBalances[key] = avgMonthlyBalances[key] + stdMonthlyBalances[key]
+            cMonth.add(1, 'months')
+        }
+        //console.log(minBalances)
+        //console.log(maxBalances)
         let minB = 0
         let maxB = 0
-        let cMonth = moment()
+        cMonth = moment()
         let labels = []
         let arrayMin = []
         let arrayMax = []
         let years = 3
         monthlyBalances.slice(1).reverse().forEach((e, i, array) => {
-            let m = moment(e.month)
+            let m = moment().month(e.month).year(e.year)
             labels.push(m.format('MMMM YYYY'))
             minB += e.balance
             maxB += e.balance
             arrayMin.push(minB)
             arrayMax.push(maxB)
-        });
+        })
+        cMonth = moment()
         for (let i = 0; i < years * 12; i++) {
-            minB += minBalance
-            maxB += maxBalance
+            minB += minBalances[cMonth.format('MM-MMM')]
+            maxB += maxBalances[cMonth.format('MM-MMM')]
             labels.push(cMonth.format('MMMM YYYY'))
             arrayMin.push(minB)
             arrayMax.push(maxB)
@@ -79,7 +119,7 @@ class Predictions extends React.Component {
                     beginAtZero: true,
                     ticks: {
                         // Include a dollar sign in the ticks
-                        callback: function(value, index, values) {
+                        callback: function (value, index, values) {
                             return EURO(value).format() + ' €';
                         }
                     }
