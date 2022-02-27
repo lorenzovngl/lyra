@@ -13,11 +13,12 @@ class Categories extends React.Component {
     return diff
   }
 
-  expensesCategories() {
+  expensesCategories(months) {
     let cat = []
+    let starting_month = moment().startOf('month').subtract(months, 'months')
     if (this.props.data.expenses !== undefined) {
       let expenses = this.props.data.expenses
-      expenses.forEach(function (e) {
+      expenses.filter(x => x.Date > starting_month).forEach(function (e) {
         let tag = e.Tags.trim()
         if (cat[tag] === undefined) {
           cat[tag] = {}
@@ -29,18 +30,21 @@ class Categories extends React.Component {
           cat[tag][e['Date'].format('YYYY-MM')] = 0
         }
         cat[tag][e['Date'].format('YYYY-MM')] += parseFloat(e.Amount)
-        cat[tag]['total'] += parseFloat(e.Amount)
+        if (e['Date'].format('YYYY-MM') !== moment().format('YYYY-MM')){
+          cat[tag]['total'] += parseFloat(e.Amount)
+        }
       })
     }
     return cat
   }
 
   render() {
-    let expenses = Object.entries(this.expensesCategories())
+    let n_months = 4
+    let expenses = Object.entries(this.expensesCategories(n_months))
     let total = 0
     if (expenses.length > 1) {
       total = expenses.map(x => x[1]['total']).reduce((acc, x) => acc + x)
-      total = total / this.days() * 30
+      total = total / n_months
     }
     expenses = expenses.sort((a, b) => {
       if (a[1]['total'] > b[1]['total']) {
@@ -53,7 +57,7 @@ class Categories extends React.Component {
     })
     let months = []
     let m = moment()
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i <= n_months; i++) {
       months.push(m.clone())
       m.subtract(1, 'months')
     }
@@ -77,7 +81,7 @@ class Categories extends React.Component {
           <tbody>
             {
               expenses.map(function (item, index) {
-                let avg_amount = item[1]['total'] / this.days() * 30
+                let avg_amount = item[1]['total'] / n_months
                 let perc = (avg_amount / total * 100).toFixed(1)
                 return <tr>
                   <td>{index + 1}.</td>

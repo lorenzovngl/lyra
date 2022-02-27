@@ -1,3 +1,41 @@
 .Movement {
     font-size: 12px;
+    border-radius: 3px;
+    margin-top: 3px;
+    padding: 2px;
+}
+
+.Movement.e0 {
+    background-color: rgba(200, 0, 0, 0.1);
+}
+
+.Movement.e10 {
+    background-color: rgba(200, 0, 0, 0.2);
+}
+
+.Movement.e50 {
+    background-color: rgba(200, 0, 0, 0.5);
+}
+
+.Movement.e100 {
+    background-color: rgba(200, 0, 0, 1);
+    color: white;
+}
+
+.Movement.i10 {
+    background-color: rgba(0, 200, 0, 0.2);
+}
+
+.Movement.i50 {
+    background-color: rgba(0, 200, 0, 0.5);
+}
+
+.Movement.i100 {
+    background-color: rgba(0, 200, 0, 0.8);
+    color: white;
+}
+
+.Movement.i1000 {
+    background-color: rgba(0, 200, 0, 1);
+    color: white;
 }

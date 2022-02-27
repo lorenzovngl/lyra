@@ -1,6 +1,7 @@
 import React from 'react'
 import './Day.css';
 import Movement from './Movement';
+import moment from 'moment'
 
 class Day extends React.Component {
 
@@ -26,6 +27,7 @@ class Day extends React.Component {
         className={this.props.disabled ? 'Day d-none d-md-block col-md disabled' : 'Day col-sm-12 col-md'}
       >
         <div>
+          <div className="weekday text-muted d-flex justify-content-end">{moment(this.props.date).format('dddd')}</div>
           <div className="number">{this.props.number}</div>
           {items}
         </div>

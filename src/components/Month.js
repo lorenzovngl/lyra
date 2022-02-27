@@ -19,11 +19,11 @@ class Month extends React.Component {
   }
 
   firstWeek() {
-    return moment().year(this.state.year).month(this.state.month).day('01').week();
+    return moment().year(this.state.year).month(this.state.month).startOf('month').week();
   }
 
   lastWeek() {
-    return moment().year(this.state.year).month(this.state.month).day('01').add(1, 'month').subtract(1, 'days').week()+1;
+    return moment().year(this.state.year).month(this.state.month).endOf('month').week()+1;
   }
 
   prev() {
@@ -62,12 +62,7 @@ class Month extends React.Component {
         return item['Date'].year() === this.state.year && item['Date'].month() === this.state.month
       }, this)
       for (let i = 0; i < expenses.length; i++) {
-        let key_notes = Object.keys(expenses[i])[4];
-        if (expenses[i][key_notes]?.indexOf("Spesa familiare") !== -1) {
-          res -= Number(expenses[i]['Amount']) * 0.4
-        } else {
-          res -= Number(expenses[i]['Amount'])
-        }
+        res -= Number(expenses[i]['Amount'])
       }
     }
     return res

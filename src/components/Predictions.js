@@ -34,15 +34,14 @@ class Predictions extends React.Component {
             }
         ))
         let avgMonthlyBalance = this.mean(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))
-        //let stdMonthlyBalance = this.std(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))
+        let stdMonthlyBalance = this.std(Object.entries(monthlyBalances).slice(1).map(x => x[1].balance))
         let avgMonthlyBalances = {}
         let stdMonthlyBalances = {}
         let cMonth = moment().month('0')
-        console.log(cMonth)
         for (let i = 0; i < 12; i++){
             let key = cMonth.format('MM-MMM')
             avgMonthlyBalances[key] = []
-            monthlyBalances.forEach((e, i, array) => {
+            monthlyBalances.slice(1).forEach((e, i, array) => {
                 if (e.month === cMonth.format('MM') && e.balance){
                     avgMonthlyBalances[key].push(e.balance)
                 }
@@ -53,12 +52,10 @@ class Predictions extends React.Component {
                 avgMonthlyBalances[key] = avgMonthlyBalance
             }
             if (isNaN(stdMonthlyBalances[key])){
-                stdMonthlyBalances[key] = 0
+                stdMonthlyBalances[key] = stdMonthlyBalance
             } 
             cMonth.add(1, 'months')
         }
-        console.log(avgMonthlyBalances)
-        console.log(stdMonthlyBalances)
         let minBalances = {}
         let maxBalances = {}
         cMonth = moment().month('0')
@@ -68,8 +65,6 @@ class Predictions extends React.Component {
             maxBalances[key] = avgMonthlyBalances[key] + stdMonthlyBalances[key]
             cMonth.add(1, 'months')
         }
-        //console.log(minBalances)
-        //console.log(maxBalances)
         let minB = 0
         let maxB = 0
         cMonth = moment()
@@ -77,8 +72,10 @@ class Predictions extends React.Component {
         let arrayMin = []
         let arrayMax = []
         let years = 3
+        console.log(monthlyBalances.slice(1))
         monthlyBalances.slice(1).reverse().forEach((e, i, array) => {
-            let m = moment().month(e.month).year(e.year)
+            console.log(e.year)
+            let m = moment().month(e.month-1).year(e.year)
             labels.push(m.format('MMMM YYYY'))
             minB += e.balance
             maxB += e.balance
@@ -118,7 +115,6 @@ class Predictions extends React.Component {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        // Include a dollar sign in the ticks
                         callback: function (value, index, values) {
                             return EURO(value).format() + ' €';
                         }

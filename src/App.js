@@ -65,11 +65,11 @@ class App extends React.Component {
 
     function preprocessExpenses(expenses) {
       for (let i = 0; i < expenses.length; i++) {
-        let key_notes = Object.keys(expenses[i])[4];
+        let key = Object.keys(expenses[i])[5];
         expenses[i]['Amount'] = Number(expenses[i]['Amount'])
-        let val = expenses[i][key_notes]?.indexOf("Spesa familiare")
+        let val = expenses[i][key]
         if (val !== undefined && val !== -1) {
-          expenses[i]['Amount'] = expenses[i]['Amount'] * 0.4
+          expenses[i]['Amount'] = expenses[i]['Amount'] * val
         }
       }
       return expenses
@@ -211,11 +211,12 @@ class App extends React.Component {
   }
 
   render() {
-    this.computeMonthlyBalances()
+    let monthlyBalances = this.computeMonthlyBalances()
+    console.log(monthlyBalances)
     let content;
     if (this.state.tabs_visibility.summary) {
       content = (
-        <Summary data={this.state.data} monthlyBalances={this.computeMonthlyBalances()}
+        <Summary data={this.state.data} monthlyBalances={monthlyBalances}
           totalIncomes={this.totalIncomes()} totalExpenses={this.totalExpenses()} balance={this.balance()} />
       )
     } else if (this.state.tabs_visibility.calendar) {
@@ -228,7 +229,7 @@ class App extends React.Component {
       )
     } else if (this.state.tabs_visibility.predictions) {
       content = (
-        <Predictions monthlyBalances={this.computeMonthlyBalances()} />
+        <Predictions monthlyBalances={monthlyBalances} />
       )
     }
     return (

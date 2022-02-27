@@ -84,9 +84,17 @@ class Summary extends React.Component {
   render() {
     let avgMonthlyBalance
     let stdMonthlyBalance
+    let avgMonthlyExpenses
+    let stdMonthlyExpenses
+    let avgMonthlyIncomes
+    let stdMonthlyIncomes
     if (this.props.monthlyBalances) {
       avgMonthlyBalance = this.mean(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].balance))
       stdMonthlyBalance = this.std(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].balance))
+      avgMonthlyExpenses = this.mean(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].expenses))
+      stdMonthlyExpenses = this.std(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].expenses))
+      avgMonthlyIncomes = this.mean(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].incomes))
+      stdMonthlyIncomes = this.std(Object.entries(this.props.monthlyBalances).slice(1).map(x => x[1].incomes))
     }
     let chartData = {
       labels: Object.entries(this.props.monthlyBalances).map(x => x[0]).reverse().map(x => moment(x).format('MMMM YYYY')),
@@ -140,6 +148,18 @@ class Summary extends React.Component {
             <tr>
               <td>Daily balance</td>
               <td id="daily-balance" align="right"><b>{EURO(this.daily(this.props.balance)).format()} €</b></td>
+            </tr>
+            <tr>
+              <td>Average monthly incomes</td>
+              <td id="daily-balance" align="right">
+                {EURO(avgMonthlyIncomes).format()} ({EURO(avgMonthlyIncomes - stdMonthlyIncomes).format()} - {EURO(avgMonthlyIncomes + stdMonthlyIncomes).format()}) €
+              </td>
+            </tr>
+            <tr>
+              <td>Average monthly expenses</td>
+              <td id="daily-balance" align="right">
+                {EURO(avgMonthlyExpenses).format()} ({EURO(avgMonthlyExpenses - stdMonthlyExpenses).format()} - {EURO(avgMonthlyExpenses + stdMonthlyExpenses).format()}) €
+              </td>
             </tr>
             <tr>
               <td>Average monthly balance</td>

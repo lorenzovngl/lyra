@@ -1,5 +1,7 @@
 # 🌌 Lyra - Budget Tracking Web App in React
 
+![GitHub repo size](https://img.shields.io/github/repo-size/lorenzovngl/lyra)
+
 This is a web application developed in React that allows you to keep track of your financial movements.
 
 ## 🛠️ Installation Steps
@@ -33,8 +35,9 @@ To allow Lyra to process the files mentioned above, these files must respect the
 1. **Date**: _String_ in format "YYYY-MM-DD";
 2. **Label**: _String_;
 3. **Amount**: _Number_ with decimal separator `.` (point);
-4. **Tags**: _String_ represent the category of that movement;
+4. **Tags**: _String_ represents the category of that movement;
 5. **Notes**: _String_, optional.
+6. **Weight**: _Number_ from 0 to 1, optional. The percent of Amount that will be considered.
 
 **Important notices**:
 

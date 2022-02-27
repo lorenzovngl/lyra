@@ -14,6 +14,10 @@
     font-size: 30px;
 }
 
+.Day .weekday {
+    font-size: 12px;
+}
+
 .Day.disabled {
     opacity: 0.5;
 }
